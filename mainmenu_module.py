@@ -1,4 +1,9 @@
 from DB_module import *
+from member_module import project, person
+
+
+MINIMUM = 3
+
 
 def show_explanation():
     # Show the explanation interface.
@@ -9,17 +14,22 @@ def show_explanation():
 
 
 def create_project():
+    global MINIMUM
     # This function shows the create project interface.
     project_name = input('Enter the project name:')
+    if isvalid_name(project_name):
+        print('Your project name is not valid')
+        project_name = input('Enter the project name:')
+
     members_number = input('Enter the number of team members:')
-    while not is_valid(members_number):
+    while not isvalid_num(members_number):
         # Test whether the number is valid.
         print('Please enter a valid value')
         members_number = input('Enter the number of team members:')
 
     members_number = int(members_number)
-    while members_number <= 0:
-        print('You can not enter a number under 0, please enter again!')
+    while members_number < MINIMUM:
+        print('You can not enter a number under 3, please enter again!')
         members_number = int(input('Enter the number of team members:'))
     print('\n')
     member_list = []
@@ -36,8 +46,11 @@ def create_project():
     print('\n')
 
 
+def isvalid_name(name):
+    return 0
+
 # Lazy evaluation
-def is_valid(number):
+def isvalid_num(number):
     """
     This function will check if the number entered is valid.
 
