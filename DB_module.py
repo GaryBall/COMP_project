@@ -1,8 +1,6 @@
 import pymysql
 import pandas as pd
 
-DB_LEN = 5                  # Global DB_LEN is mainly used in function add_project
-
 
 def establish_project():
     """
@@ -17,19 +15,31 @@ def establish_project():
 
     # If table exist, then drop it to establish a new one.
     cursor.execute("DROP TABLE IF EXISTS PROJECT")
+    cursor.execute("DROP TABLE IF EXISTS PERSON")
 
     # Esatabilsh an initually table consisted of project name, 5 names and number of members.
     # If users enter more than 5 names, we will extend more columns to store name in add_project function.
     sql = """CREATE TABLE PROJECT (
                     PROJECT_NAME CHAR(20),
+                    MEMBER_NUMBER INT ,
                     NAME1  CHAR(20) NOT NULL,
-                    NAME2  CHAR(20) ,
+                    NAME2  CHAR(20) NOT NULL,
                     NAME3  CHAR(20) ,
                     NAME4  CHAR(20) ,
-                    NAME5  CHAR(20) ,
-                    NUMBER INT )"""
+                    NAME5  CHAR(20) )"""
+
+    sql2 = """CREATE TABLE PERSON (
+                    PERSON_NAME CHAR(20),
+                    UPPER_PROJECT CHAR(20) NOT NULL,
+                    VOTE1   CHAR(20) NOT NULL,
+                    VOTE2   CHAR(20) NOT NULL,
+                    VOTE3  CHAR(20) ,
+                    VOTE4  CHAR(20) ,
+                    VOTE5  CHAR(20) ,
+                    VOTE_NUMBER INT )"""
 
     cursor.execute(sql)
+    cursor.execute(sql2)
     db.close()
 
 
@@ -53,6 +63,9 @@ def DB_show():
         db.close()
     df = pd.DataFrame(list(result))  # Convert tuple to list, then DataFrame
     print(df)
+
+
+DB_LEN = 5                  # Global DB_LEN is mainly used in function add_project
 
 
 def add_project(project_name, number, name_list):
@@ -106,7 +119,7 @@ def add_project(project_name, number, name_list):
         sql_values += """'%s', """ % count2
 
     sql = """INSERT INTO PROJECT(PROJECT_NAME,
-             %s NUMBER)
+             %s MEMBER_NUMBER)
              VALUES (%s %d)""" % (multi_name, sql_values, number)
     try:
         cursor.execute(sql)
@@ -115,4 +128,75 @@ def add_project(project_name, number, name_list):
         print('database execution error!')
         db.rollback()
     db.close()
+
+
+def get_pjname(p_name):
+    name = 1
+    return name
+
+
+def get_member_num(project_name):
+    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    cursor = db.cursor()
+
+    sql  = """select * from PROJECT
+              where PROJECT_NAME = '%s'
+    """ % project_name
+
+    try:
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        for row in results:
+            name = row[1]
+    except ValueError as e:
+        print('No results!')
+        db.rollback()
+    db.close()
+
+    return name
+
+
+def add_member_num(member_number):
+    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    cursor = db.cursor()
+
+    sql = """select * from PROJECT
+                  where PROJECT_NAME = '%d'
+        """ % member_number
+
+    try:
+        cursor.execute(sql)
+        results = cursor.fetchall()
+    except ValueError as e:
+        print('Adding failed')
+        db.rollback()
+    db.close()
+
+
+def get_name_list(project_name):
+    member_list = []
+    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    cursor = db.cursor()
+    sql = """select * from PROJECT
+              where PROJECT_NAME = '%s'
+              """ % project_name
+
+    try:
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        for row in results:
+            for i in range(2, len(row)):
+                if row[i] is not None:
+                    member_list.append(row[i])
+    except ValueError as e:
+        print('Fetch failed')
+        db.rollback()
+
+    db.close()
+    return member_list
+
+
+def get_data(project_name):
+    name = 1
+    return name
 
