@@ -1,5 +1,5 @@
 from DB_module import *
-from member_module import project, person
+from member_module import Project, Person
 
 
 MINIMUM = 3
@@ -40,7 +40,7 @@ def create_project():
 
     print('\n')
 
-    add_project(project_name, members_number, member_list)
+    projectA = Project(project_name, members_number, member_list)
 
     input('Press <Enter> to return to the main menu:')
     print('\n')
@@ -71,7 +71,58 @@ def is_int(number):
 
 
 def enter_votes():
-    return 0
+    project_name = input('Enter project name:')
+
+    # connect to class Project to get name list
+
+    member_list = get_name_list(project_name)
+    # make sure that project name is valid
+
+    members_number = len(member_list)
+    print(member_list)
+
+    project_name_enter = input('Enter the project name:')
+    if project_name_enter == project_name:
+        print('There are {} team members.'.format(members_number))
+        print('\n')
+        for member_name in member_list:
+            vote_list = []
+            while True:
+                print("Enter {}'s votes, points must add up to 100:".format(member_name))
+                count = 0
+                for second_name in member_list:
+                    if second_name != member_name:
+                        while True:
+                            thevote = input("\tEnter {}'s points for {}:\t".format(member_name, second_name))
+                            if thevote.isdigit():
+                                thevote_int = int(thevote)
+                                count += thevote_int
+                                vote_list.append(thevote)
+                                break
+                            else:
+                                print("***Error: Votes must be integers. Please Enter {}'s points for {} again.".format(
+                                    member_name, second_name))
+                                continue
+                    else:
+                        vote_list.append('0')
+                if count == 100:
+                    break
+                else:
+                    print('\n')
+                    print("***Error: Points must add up to 100. Please Enter {}'s votes again.".format(member_name))
+                    vote_list = []
+                    continue
+
+            person1 = Person(project_name, member_list, member_name, vote_list)
+            print(vote_list)
+
+            print('\n')
+    else:
+        print('\n')
+        print('No such project.')
+
+    input('Press <Enter> to return to the main menu:')
+    print('\n')
 
 
 def show_project():

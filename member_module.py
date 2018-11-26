@@ -1,12 +1,28 @@
 from DB_module import *
 # 讨论结构是否合理，因为project和person的存储空间不同，而且也不需要用继承类。
 
-class project():
+
+class Project:
 
     # constructor
-    def __init__(self, project_name, num_member):
+    def __init__(self,project_name, num_member, name_list):
+        '''
         self.p_name = project_name
         self.number = num_member
+        self.member_list = name_list
+        '''
+        #is_project = 1
+        add_project(project_name, num_member, name_list)
+
+    @property
+    def member_list(self):
+        self._member_list = get_name_list(self.p_name)
+        return self._member_list
+
+    @member_list.setter
+    def member_list(self, theNamelist):
+        add_namelist(theNamelist)
+
 
 
     @property
@@ -57,18 +73,22 @@ class project():
         print(noDigit)
         return noDigit
 
-
     def __str__(self):
         return str(self.number) + ' ' + str(self.p_name)
 
 
-class person(project):
+class Person(Project):
     # constructor
-    def __init__(self, project_name, num_member, member_name, vote_list):
-        project.__init__(self, project_name, num_member)
+    def __init__(self, project_name, name_list, member_name, vote_list):
+        is_project = 0
+        # super().__init__(self, project_name, num_member, name_list)
 
         self.m_name = member_name
+        self.p_name = project_name
         self.vote = vote_list
+
+
+
 
     @property
     def m_name(self):
@@ -82,15 +102,19 @@ class person(project):
             raise ValueError("Invalid member name" + theName)
 
 
-
     @property
     def vote(self):
+        _vote = get_vote_list(self.p_name, self.m_name)
         return self._vote
 
     @vote.setter
-    def vote(self,vote_list):
-        if vote_list != None:
-            _vote = vote_list
+    def vote(self, thevote_list):
+        if thevote_list != None:
+            member_list = get_name_list(self.p_name)
+            add_vote_list(self.p_name, self.m_name, member_list, thevote_list)
         else:
             raise ValueError("Invalid vote!")
+
+
+
 

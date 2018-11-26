@@ -15,7 +15,6 @@ def establish_project():
 
     # If table exist, then drop it to establish a new one.
     cursor.execute("DROP TABLE IF EXISTS PROJECT")
-    cursor.execute("DROP TABLE IF EXISTS PERSON")
 
     # Esatabilsh an initually table consisted of project name, 5 names and number of members.
     # If users enter more than 5 names, we will extend more columns to store name in add_project function.
@@ -28,18 +27,7 @@ def establish_project():
                     NAME4  CHAR(20) ,
                     NAME5  CHAR(20) )"""
 
-    sql2 = """CREATE TABLE PERSON (
-                    PERSON_NAME CHAR(20),
-                    UPPER_PROJECT CHAR(20) NOT NULL,
-                    VOTE1   CHAR(20) NOT NULL,
-                    VOTE2   CHAR(20) NOT NULL,
-                    VOTE3  CHAR(20) ,
-                    VOTE4  CHAR(20) ,
-                    VOTE5  CHAR(20) ,
-                    VOTE_NUMBER INT )"""
-
     cursor.execute(sql)
-    cursor.execute(sql2)
     db.close()
 
 
@@ -68,7 +56,7 @@ def DB_show():
 DB_LEN = 5                  # Global DB_LEN is mainly used in function add_project
 
 
-def add_project(project_name, number, name_list):
+def add_project(project_name, number, name_list, is_project):
     """
     This function could create or add a project into the database,
     which will generate a data row in the table PROJECT.
@@ -90,17 +78,19 @@ def add_project(project_name, number, name_list):
 
     db = pymysql.connect("localhost", "root", "jky594176", "project_member")
     cursor = db.cursor()
-    multi_name = ''                 # Create a string to store member name.
+    multi_name = ''  # Create a string to store member name.
     sql_values = """'%s',""" % project_name
 
     global DB_LEN
+    print(number, type(number))
+    print(type(DB_LEN))
     if number > DB_LEN:
         # Users enter more names than the maximum of former input, extend columns.
-        for count_add in range(DB_LEN+1, len(name_list)+1, 1):
+        for count_add in range(DB_LEN + 1, len(name_list) + 1, 1):
             # Create a string to alter table.
             add_value = 'NAME%d' % count_add
             sql_add_obeject = '''alter table PROJECT add %s CHAR(20) after NAME%d
-            ''' % (add_value, count_add-1)
+                    ''' % (add_value, count_add - 1)
             try:
                 # submit to databse to run
                 cursor.execute(sql_add_obeject)
@@ -109,30 +99,52 @@ def add_project(project_name, number, name_list):
                 # if error happens, rollback
                 print('database execution error!')
                 db.rollback()
-            DB_LEN = number             # Renew the DB_LEN
+            DB_LEN = number  # Renew the DB_LEN
 
     # Create a string to add data into database
     for count1 in range(number):
-        multi_name += 'NAME%d, ' % (count1+1)
+        multi_name += 'NAME%d, ' % (count1 + 1)
 
     for count2 in name_list:
         sql_values += """'%s', """ % count2
 
     sql = """INSERT INTO PROJECT(PROJECT_NAME,
-             %s MEMBER_NUMBER)
-             VALUES (%s %d)""" % (multi_name, sql_values, number)
+                     %s MEMBER_NUMBER)
+                     VALUES (%s %d)""" % (multi_name, sql_values, number)
     try:
         cursor.execute(sql)
         db.commit()
     except ValueError as e:
         print('database execution error!')
         db.rollback()
+
+    create_person_table(project_name, name_list)
+
+
+def create_person_table(project_name, member_list):
+    sql_member_list = ''
+    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    cursor = db.cursor()
+    cursor.execute("DROP TABLE IF EXISTS %s" % project_name)
+
+    for member in member_list:
+        sql_member_list += ''',\n\t%s INT''' % member
+
+    sql = '''CREATE TABLE %s (
+    PERSON_NAME CHAR(20)%s) 
+    '''% (project_name, sql_member_list)
+    print(sql)
+    cursor.execute(sql)
+    db.commit()
     db.close()
+
+    return 0
 
 
 def get_pjname(p_name):
     name = 1
     return name
+
 
 def get_member_num(project_name):
     db = pymysql.connect("localhost", "root", "jky594176", "project_member")
@@ -170,6 +182,77 @@ def add_member_num(member_number):
         print('Adding failed')
         db.rollback()
     db.close()
+
+
+def get_name_list(project_name):
+    member_list = []
+    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    cursor = db.cursor()
+    sql = """select * from PROJECT
+              where PROJECT_NAME = '%s'
+              """ % project_name
+
+    try:
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        for row in results:
+            for i in range(2, len(row)):
+                if row[i] is not None:
+                    member_list.append(row[i])
+    except ValueError as e:
+        print('Fetch failed')
+        db.rollback()
+
+    db.close()
+    return member_list
+
+
+def add_vote_list(project_name, member_name, name_list, the_vote_list):
+
+    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    cursor = db.cursor()
+    sql_name_list = ''
+    sql_vote_list = ''
+    for vote in the_vote_list:
+        sql_vote_list += ''', %s''' % vote
+    for name in name_list:
+        sql_name_list += ',%s' % name
+
+    sql = """INSERT INTO %s(PERSON_NAME%s)
+            VALUES ('%s' %s)""" % (project_name, sql_name_list, member_name, sql_vote_list)
+
+    print(sql)
+    cursor.execute(sql)
+    db.commit()
+
+    db.close()
+
+
+def get_vote_list(table_name, person_name):
+    member_vote = []
+    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    cursor = db.cursor()
+    sql = """select * from %s
+                  where PERSON_NAME = '%s'
+                  """ % (table_name, person_name)
+
+    try:
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        for row in results:
+            for i in range(1, len(row)):
+                if row[i] is not None:
+                    member_vote.append(row[i])
+    except ValueError as e:
+        print('Fetch failed')
+        db.rollback()
+
+    db.close()
+    return member_vote
+
+def add_namelist(name_list):
+    list =[]
+    return list
 
 
 def get_data(project_name):
