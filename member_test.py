@@ -4,7 +4,8 @@ from mainmenu_module import *
 
 def main():
 
-    enter_votes()
+    a = db_find_project('pA')
+    print(a)
 
 if __name__  == "__main__":
     main()

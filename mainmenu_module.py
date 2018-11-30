@@ -72,19 +72,18 @@ def is_int(number):
 
 def enter_votes():
     project_name = input('Enter project name:')
+    # 输错p_name还要改
 
     # connect to class Project to get name list
 
-    member_list = get_name_list(project_name)
     # make sure that project name is valid
-
-    members_number = len(member_list)
-    print(member_list)
-
-    project_name_enter = input('Enter the project name:')
-    if project_name_enter == project_name:
+    if db_find_project(project_name):
+        member_list = get_name_list(project_name)
+        members_number = len(member_list)
+        print(member_list)
         print('There are {} team members.'.format(members_number))
         print('\n')
+        member_class_list = []
         for member_name in member_list:
             vote_list = []
             while True:
@@ -113,8 +112,9 @@ def enter_votes():
                     vote_list = []
                     continue
 
-            person1 = Person(project_name, member_list, member_name, vote_list)
-            print(vote_list)
+            person = Person(project_name, member_name, vote_list)
+            member_class_list.append(person)
+            print(member_class_list)
 
             print('\n')
     else:

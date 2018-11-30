@@ -5,53 +5,47 @@ from DB_module import *
 class Project:
 
     # constructor
-    def __init__(self, project_name, num_member, name_list):
-
-        self.p_name = project_name
-        self.number = num_member
-        self.member_list = name_list
-
+    def __init__(self, num_member, name_list, project_name='pA'):
         add_project(project_name, num_member, name_list)
-        create_person_table(project_name, name_list)
 
-    @property
     def member_list(self):
         self._member_list = get_name_list(self.p_name)
         return self._member_list
 
-    @member_list.setter
-    def member_list(self, the_namelist):
-        _member_list = the_namelist
-        # add_namelist(the_namelist)
+    # @member_list.setter
+    # def member_list(self, theNamelist):
+    #    add_namelist(theNamelist)
 
 
 
     @property
     def number(self):
         # get_member_num use PyMysql to get the value from database
-        # self._number = get_member_num(self._p_name)
+        self._number = get_member_num(self._p_name)
         return self._number
 
-    @number.setter
+    ''''@number.setter
     def number(self, theNumber):
         if not self.no_digit(theNumber):
-            self._number = theNumber
             # add_member_num use PyMysql to add the value to database
-            # add_member_num(self.p_name, theNumber)
+            add_member_num(theNumber)
         else:
-            raise ValueError("Invalid member number " + theNumber)
+            raise ValueError("Invalid member number " + theNumber)'''
 
     @property
-    def p_name(self):
+    def _p_name(self):
         return self._p_name
 
+
+    '''
     @p_name.setter
-    def p_name(self, the_name):
-        if self.no_digit(the_name):
-            self._p_name = the_name
+    def p_name(self, theName):
+        if self.no_digit(theName):
+            self._p_name = theName
 
         else:
-            raise ValueError("Invalid project name " + the_name)
+            raise ValueError("Invalid project name " + theName)
+            '''
 
     def no_digit(self, str):
         '''if isinstance(str, 'int'):
@@ -62,9 +56,6 @@ class Project:
         但是后面链接了数据库以后，输出的是什么类型，就应该按什么类型处理。
         如输入int？
         '''
-        if isinstance(str, int):
-            noDigit = False
-            return noDigit
         str_length = len(str)
         count = 0
         for letter in str:
@@ -84,40 +75,39 @@ class Project:
 
 class Person(Project):
     # constructor
-    def __init__(self, project_name, member_name, vote_list):
-        is_project = 0
-        # super().__init__(self, project_name, num_member, name_list)
+    def __init__(self, project_name, num_member, name_list, member_name):
+        Project.__init__(self, project_name, num_member, name_list)
 
         self.m_name = member_name
-        self.p_name = project_name
-        self.vote = vote_list
 
+        # 其实可以使用字典来存储vote, 在一个人类中存储对其他人的投票
+        self.vote = self.vote_list()
 
     @property
     def m_name(self):
         return self._m_name
 
     @m_name.setter
-    def m_name(self, the_name):
-        if self.no_digit(the_name):
-            self._m_name = the_name
+    def m_name(self, theName):
+        if self.no_digit(theName):
+            self._m_name = theName
         else:
-            raise ValueError("Invalid member name" + the_name)
+            raise ValueError("Invalid member name" + theName)
+
 
 
     @property
     def vote(self):
-        _vote = get_vote_list(self.p_name, self.m_name)
         return self._vote
 
     @vote.setter
-    def vote(self, thevote_list):
-        if thevote_list != None:
-            member_list = get_name_list(self.p_name)
-            add_vote_list(self.p_name, self.m_name, member_list, thevote_list)
+    def vote(self,vote_list):
+        if vote_list != None:
+            _vote = vote_list
         else:
             raise ValueError("Invalid vote!")
 
-
-
+    def vote_list(self):
+        the_vote_list = []
+        return the_vote_list
 
