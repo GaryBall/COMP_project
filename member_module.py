@@ -53,7 +53,8 @@ class Project:
         else:
             raise ValueError("Invalid project name " + the_name)
 
-    def no_digit(self, str):
+    @staticmethod
+    def no_digit(str):
         '''if isinstance(str, 'int'):
             noDigit = False
             return noDigit
@@ -73,16 +74,14 @@ class Project:
             except ValueError as e:
                 count += 1
                 continue
-        print(count, str_length)
         noDigit = bool(count == str_length)
-        print(noDigit)
         return noDigit
 
     def __str__(self):
         return str(self.number) + ' ' + str(self.p_name)
 
 
-class Person(Project):
+class Person:
     # constructor
     def __init__(self, project_name, member_name, vote_list):
         is_project = 0
@@ -99,7 +98,7 @@ class Person(Project):
 
     @m_name.setter
     def m_name(self, the_name):
-        if self.no_digit(the_name):
+        if Project.no_digit(the_name):
             self._m_name = the_name
         else:
             raise ValueError("Invalid member name" + the_name)
@@ -118,6 +117,21 @@ class Person(Project):
         else:
             raise ValueError("Invalid vote!")
 
+
+    @property
+    def p_name(self):
+        return self._p_name
+
+    @p_name.setter
+    def p_name(self,the_pj_name):
+        if Project.no_digit(the_pj_name):
+            self._p_name = the_pj_name
+        else:
+            raise ValueError("Invalid project name " + the_pj_name)
+
+
+    def __str__(self):
+        return str(self.m_name) + ' ' + str(self.p_name)
 
 
 

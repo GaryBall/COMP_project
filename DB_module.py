@@ -66,8 +66,29 @@ def DB_show():
         db.close()
 
 
-
 DB_LEN = 5                  # Global DB_LEN is mainly used in function add_project
+
+
+def DB_show_project():
+    """
+    This function show the projects in the database. Compare to DB_show,
+    it can not show the detailed content of specific project
+    @return:
+    """
+    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    cursor = db.cursor()
+    sql_show = "select * from PROJECT"
+    try:
+
+        cursor.execute(sql_show)
+        result = cursor.fetchall()  # fetch function return TUPLE
+        print('you have following projects:')
+        for row in result:
+            print(row[0])
+    except ValueError as e:
+        print("database show failed")
+
+    db.close()
 
 
 def add_project(project_name, number, name_list):
@@ -132,8 +153,22 @@ def add_project(project_name, number, name_list):
         print('database execution error!')
         db.rollback()
 
+        '''
+        UPDATE PROJECT SET MEMBER_NUM = 7 WHERE PROJECT_NAME = 'pA'
+        '''
+
 
 def create_person_table(project_name, member_list):
+    """
+    Create a tables in database to store the vote data from members.
+    This table contains project name, member name and name list of members.
+
+    @type project_name: string
+    @param project_name:
+    @type member_list: list
+    @param member_list:
+    @return:
+    """
     sql_member_list = ''
     db = pymysql.connect("localhost", "root", "jky594176", "project_member")
     cursor = db.cursor()
@@ -150,10 +185,14 @@ def create_person_table(project_name, member_list):
     db.commit()
     db.close()
 
-    return 0
-
 
 def get_member_num(project_name):
+    """
+    This function get the member numbers of a project from table PROJECT
+    @type string
+    @param project_name:
+    @return:
+    """
     db = pymysql.connect("localhost", "root", "jky594176", "project_member")
     cursor = db.cursor()
 
@@ -175,6 +214,12 @@ def get_member_num(project_name):
 
 
 def add_member_num(project_name, member_number):
+    """
+
+    @param project_name:
+    @param member_number:
+    @return:
+    """
     db = pymysql.connect("localhost", "root", "jky594176", "project_member")
     cursor = db.cursor()
 
@@ -193,6 +238,14 @@ def add_member_num(project_name, member_number):
 
 
 def get_name_list(project_name):
+    """
+    get name list from table PROJECT of database by input project name.
+
+
+    @type project_name: string
+    @param project_name:
+    @return:
+    """
     member_list = []
     db = pymysql.connect("localhost", "root", "jky594176", "project_member")
     cursor = db.cursor()
@@ -216,6 +269,20 @@ def get_name_list(project_name):
 
 
 def add_vote_list(project_name, member_name, name_list, the_vote_list):
+    """
+    Store vote list of a specific member into database. This vote list
+    is the mark a member vote to others.
+
+    @type project_name: string
+    @param project_name:
+    @type member_name: string
+    @param member_name:
+    @type name_list: list
+    @param name_list:
+    @type the_vote_list: list
+    @param the_vote_list:
+    @return:
+    """
 
     db = pymysql.connect("localhost", "root", "jky594176", "project_member")
     cursor = db.cursor()
@@ -237,6 +304,14 @@ def add_vote_list(project_name, member_name, name_list, the_vote_list):
 
 
 def get_vote_list(table_name, person_name):
+    """
+    This function can get the vote list from the table of input project
+    according to the table_name and person_name
+
+    @param table_name:
+    @param person_name:
+    @return:
+    """
     member_vote = []
     db = pymysql.connect("localhost", "root", "jky594176", "project_member")
     cursor = db.cursor()
@@ -281,6 +356,47 @@ def db_find_project(project_name):
     return 0
 
 
+def project_existed(project_name):
+    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    cursor = db.cursor()
+    sql = """select * from %s""" % project_name
+
+    try:
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        print(result)
+
+    except ValueError as e:
+        print('Fetch failed')
+        db.rollback()
+
+    if result != ():
+        db.close()
+        return 1
+    else:
+        db.close()
+        return 0
+
+
+def drop_table(project_name):
+    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    cursor = db.cursor()
+    sql = """delete from %s""" % project_name
+
+    try:
+        cursor.execute(sql)
+        db.commit()
+
+    except ValueError as e:
+        print('Delete failed')
+        db.rollback()
+
+    db.close()
+
+# def drop_table(project_name):
+
+
+
 ''' def add_namelist(name_list):
     list =[]
     return list 
@@ -289,5 +405,4 @@ def db_find_project(project_name):
 def get_data(project_name):
     name = 1
     return name
-
-'''
+    '''
