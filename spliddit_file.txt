@@ -1,0 +1,6 @@
+projectA ,3 ,Asim,Bogdan,Xiang,Xiang,Asim,50,Bogdan,50,Bogdan,Xiang,35,Asim,65,Asim,Bogdan,60,Xiang,40
+projectB, 3, Amelie,Brian,Cato,Amelie,Brian,45,Cato,55,Brian,Amelie,50,Cato,50,Cato,Amelie,50,Brian,50
+projectC, 4,Axel,Bo,Chuzi,Aria,Axel, Aria,40,Chuzi,40, Bo,20,Bo,Axel,40,Chuzi,30,Aria,30,Chuzi,Axel,45,Bo,25,Aria,30,Aria,Axel,20,Bo,40,Chuzi,40
+projectB, 3, Amelie,Brian,Cato,Amelie,Brian,45,Cato,55,Brian,Amelie,50,Cato,50,Cato,Amelie,50,Brian,50
+projectD, 3, Amelie,Brian,Cato,Amelie,Brian,Cato,55,Brian,Amelie,50,Cato,50,Cato,Amelie,50,Brian,50
+project5, 3, Amelie,Brian,Amelie,Brian,45,Cato,55,Brian,Amelie,50,Cato,50,Cato,Amelie,50,Brian,50

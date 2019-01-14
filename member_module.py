@@ -26,8 +26,6 @@ class Project:
         self.number = num_member
         self.member_list = name_list
 
-
-
     @property
     def member_list(self):
         self._member_list = get_name_list(self.p_name)
@@ -85,7 +83,8 @@ class Project:
         return noDigit
 
     def __str__(self):
-        return str(self.number) + ' ' + str(self.p_name)
+        return str(self.p_name) + ' contains ' + str(self.number) + ' members, they are:'\
+               + str(self.member_list)
 
 
 class Person:
@@ -116,13 +115,15 @@ class Person:
 
     @property
     def vote(self):
-        _vote = get_vote_list(self.p_name, self.m_name)
+        # get votes list from database.
+        self._vote = get_vote_list(self.p_name, self.m_name)
         return self._vote
 
     @vote.setter
     def vote(self, thevote_list):
         if thevote_list is not None:
             member_list = get_name_list(self.p_name)
+            # send vote list to database
             add_vote_list(self.p_name, self.m_name, member_list, thevote_list)
         else:
             raise ValueError("Invalid vote!")
@@ -139,4 +140,5 @@ class Person:
             raise ValueError("Invalid project name " + the_pj_name)
 
     def __str__(self):
-        return str(self.m_name) + ' ' + str(self.p_name)
+        return str(self.m_name) + ' belongs to ' + str(self.p_name)+\
+               ', here are his votes to others: ' + str(self.vote)

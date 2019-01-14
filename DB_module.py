@@ -10,6 +10,7 @@ def establish_project():
        """
 
     # Establish database connection with root and passport
+    global db
     db = pymysql.connect("localhost", "root", "jky594176", "project_member")
     cursor = db.cursor()
 
@@ -28,7 +29,7 @@ def establish_project():
                     NAME5  CHAR(20) )"""
 
     cursor.execute(sql)
-    db.close()
+    # db.close()
 
 
 def DB_show():
@@ -40,7 +41,8 @@ def DB_show():
         @return:
         """
     # Connect again
-    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    # db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    global db
     cursor = db.cursor()
     sql_show = "select * from PROJECT"
     try:
@@ -71,34 +73,40 @@ def DB_show():
             else:
                 print("You have't voted")
         finally:
-            db.close()
+            pass
+            # db.close()
     else:
-        db.close()
+        # db.close()
+        pass
 
 
 def DB_show_project():
     """
     This function show the projects in the database. Compared to DB_show,
     it can not show the detailed content of specific project.
-    @return: No turn
+    @return: the result of search
     """
-    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    # db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    global db
     cursor = db.cursor()
     sql_show = "select * from PROJECT"
     try:
 
         cursor.execute(sql_show)
         result = cursor.fetchall()  # fetch function return TUPLE
-        print('you have following projects:')
-        for row in result:
-            print(row[0])
+        if result != ():
+            
+            return result
+        else:
+            print("You do not have project!")
+            return result
     except ValueError as e:
         print("database show failed")
 
-    db.close()
+    # db.close()
 
 
-DB_LEN = 5                  # Global DB_LEN is mainly used in function add_project
+DB_LEN = 5   # Global DB_LEN is mainly used in function add_project
 
 
 def add_project(project_name, number, name_list):
@@ -121,7 +129,9 @@ def add_project(project_name, number, name_list):
     @return: None
     """
 
-    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    # db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    global db
+
     cursor = db.cursor()
     multi_name = ''  # Create a string to store member name.
     sql_values = """'%s',""" % project_name
@@ -161,10 +171,6 @@ def add_project(project_name, number, name_list):
         print('database execution error!')
         db.rollback()
 
-        '''
-        UPDATE PROJECT SET MEMBER_NUM = 7 WHERE PROJECT_NAME = 'pA'
-        '''
-
 
 def create_person_table(project_name, member_list):
     """
@@ -178,7 +184,8 @@ def create_person_table(project_name, member_list):
     @return:
     """
     sql_member_list = ''
-    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    # db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    global db
     cursor = db.cursor()
     cursor.execute("DROP TABLE IF EXISTS %s" % project_name)
 
@@ -190,7 +197,7 @@ def create_person_table(project_name, member_list):
     '''% (project_name, sql_member_list)
     cursor.execute(sql)
     db.commit()
-    db.close()
+    # db.close()
 
 
 def get_member_num(project_name):
@@ -200,7 +207,8 @@ def get_member_num(project_name):
     @param project_name: The name of target project name.
     @return: Member number of a project
     """
-    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    # db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    global db
     cursor = db.cursor()
 
     # Find all the information from
@@ -228,7 +236,8 @@ def add_member_num(project_name, member_number):
     @param member_number:
     @return:
     """
-    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    # db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    global db
     cursor = db.cursor()
 
     sql = """
@@ -242,7 +251,7 @@ def add_member_num(project_name, member_number):
     except ValueError as e:
         print('Adding failed')
         db.rollback()
-    db.close()
+    # db.close()
 
 '''
 def add_namelist(project_name, name_list):
@@ -267,7 +276,6 @@ def add_namelist(project_name, name_list):
 '''
 
 
-
 def get_name_list(project_name):
     """
     get name list from table PROJECT of database by input project name.
@@ -278,7 +286,8 @@ def get_name_list(project_name):
     @return:
     """
     member_list = []
-    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    # db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    global db
     cursor = db.cursor()
     # Get all the infromation of the project
     sql = """select * from PROJECT
@@ -297,7 +306,7 @@ def get_name_list(project_name):
         print('Fetch failed')
         db.rollback()
 
-    db.close()
+    # db.close()
     return member_list
 
 
@@ -317,7 +326,8 @@ def add_vote_list(project_name, member_name, name_list, the_vote_list):
     @return:
     """
 
-    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    # db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    global db
     cursor = db.cursor()
     sql_name_list = ''
     sql_vote_list = ''
@@ -334,7 +344,7 @@ def add_vote_list(project_name, member_name, name_list, the_vote_list):
     cursor.execute(sql)
     db.commit()
 
-    db.close()
+    # db.close()
 
 
 def get_vote_list(table_name, person_name):
@@ -349,7 +359,8 @@ def get_vote_list(table_name, person_name):
     @return: the vote result of a project
     """
     member_vote = []
-    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    # db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    global db
     cursor = db.cursor()
     sql = """select * from %s
                   where PERSON_NAME = '%s'
@@ -358,6 +369,8 @@ def get_vote_list(table_name, person_name):
     try:
         cursor.execute(sql)
         results = cursor.fetchall()
+        if results == ():
+            return []
         for row in results:
             for i in range(1, len(row)):
                 if row[i] is not None:
@@ -366,7 +379,7 @@ def get_vote_list(table_name, person_name):
         print('Fetch failed')
         db.rollback()
 
-    db.close()
+    # db.close()
     return member_vote
 
 
@@ -378,7 +391,8 @@ def db_find_project(project_name):
     @return: finding result. True or false
     """
 
-    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    # db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    global db
     cursor = db.cursor()
     sql = """select * from PROJECT
                   where PROJECT_NAME = '%s'
@@ -393,9 +407,9 @@ def db_find_project(project_name):
         db.rollback()
 
     if result != ():
-        db.close()
+        # db.close()
         return 1
-    db.close()
+    # db.close()
     return 0
 
 
@@ -408,7 +422,8 @@ def project_voted(project_name):
     @param project_name: The project name to be checked
     @return: Checking result, true or false
     """
-    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    # db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    global db
     cursor = db.cursor()
     sql = """select * from %s""" % project_name
 
@@ -421,10 +436,10 @@ def project_voted(project_name):
         db.rollback()
 
     if result != ():
-        db.close()
+        # db.close()
         return 1
     else:
-        db.close()
+        # db.close()
         return 0
 
 
@@ -436,7 +451,8 @@ def drop_table(project_name):
     @param project_name: The target project name
     @return:
     """
-    db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    # db = pymysql.connect("localhost", "root", "jky594176", "project_member")
+    global db
     cursor = db.cursor()
     sql = """delete from %s""" % project_name
 
@@ -448,8 +464,102 @@ def drop_table(project_name):
         print('Delete failed')
         db.rollback()
 
-    db.close()
+    # db.close()
 
 # def drop_table(project_name):
 
 
+def est_vote_table(max_len):
+    """
+    establish a database table for vote result according to the maximum length
+    of several project.
+    This will be executed when our project is going to finish.
+    @type max_len: int
+    @param max_len: the maximum number of members in projects
+    @return:
+    """
+
+    global db
+    cursor = db.cursor()
+    cursor.execute("DROP TABLE IF EXISTS VOTE_RESULT")
+
+    # Esatabilsh an initually table consisted of project name, 5 names and number of members.
+    # If users enter more than 5 names, we will extend more columns to store name in add_project function.
+    sql = """CREATE TABLE VOTE_RESULT (
+                        PROJECT_NAME CHAR(20),
+                        MEMBER_NUMBER INT ,
+                        NAME1  CHAR(20) NOT NULL,
+                        VOTE1  INT NOT NULL,
+                        NAME2  CHAR(20) ,
+                        VOTE2  INT"""
+
+    for i in range(max_len-2):
+        sql += """,
+        NAME%d CHAR(20),
+        VOTE%d INT
+        """ % (i+3, i+3)
+    sql += ')'
+    cursor.execute(sql)
+
+
+def vote_to_db(project_name, name_list, vote_result):
+    """
+    Store the allocation result of votes of a project.
+    The store format is integer due to the processing of database
+
+    @type project_name: string
+    @param project_name: the name of project after calculation
+    @type name_list: list
+    @param name_list: the member list of project
+    @type vote_result: list
+    @param vote_result: the allocation result after voting and calculation
+    @return:
+    """
+
+    global db
+    cursor = db.cursor()
+
+    multi_name = ''  # Create a string to store member name.
+    sql_values = """'%s',""" % project_name
+    list_len = len(name_list)
+
+    for count1 in range(list_len):
+        multi_name += 'NAME%d, VOTE%d, ' % (count1 + 1, count1+1)
+        sql_values += """'%s', %d,  """ % (name_list[count1], vote_result[count1]*100)
+
+    sql = """INSERT INTO VOTE_RESULT(PROJECT_NAME,
+                         %s MEMBER_NUMBER)
+                         VALUES (%s %d)""" % (multi_name, sql_values, list_len)
+    try:
+        cursor.execute(sql)
+        db.commit()
+    except ValueError as e:
+        print('database execution error!')
+        db.rollback()
+
+
+def get_if_from_db(project_name):
+    """
+    get all the information of a specific project by its name.
+
+    @type project_name: string
+    @param project_name: to project to be fetched
+    @return:
+    """
+
+    global db
+    cursor = db.cursor()
+    sql_show = "select * from %s" % project_name
+    try:
+        cursor.execute(sql_show)
+        result = cursor.fetchall()  # fetch function return TUPLE
+
+    except ValueError as e:
+        print("database show failed")
+
+    return result
+
+
+def db_close():
+    global db
+    db.close()

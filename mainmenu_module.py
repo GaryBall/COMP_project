@@ -1,5 +1,7 @@
 from DB_module import *
 from member_module import Project, Person
+import fileIO
+import calculate_vote as cv
 
 
 def show_explanation():
@@ -13,7 +15,7 @@ def show_explanation():
           'are not supposed to enter a name more than 20 letters')
 
 
-# A list to store all the project classes.
+# A global list to store all the project classes.
 project_list = []
 
 
@@ -86,21 +88,35 @@ def is_int(number):
         return 0            # Return False if failed
 
 
-def enter_votes():
-    flag = 0
-    while flag == 0:
-        print("You now have following project:")
-        DB_show_project()
-        project_name = input('Enter project name:')
-        # 输错p_name还要改
+# This is a global list built for store Person class.
+member_class_list = []
 
+
+def enter_votes():
+    """
+    This function is for members to enter votes for
+    the other members in existing projects.
+
+    @return:None
+    """
+    flag = 0
+    if DB_show_project() == ():
+        flag = 1
+
+    while flag == 0:
+        # Here we show all the existing projects that are able to be chosen.
+        print("You now have following project:")
+        result = DB_show_project()
+        for row in result:
+                print(row[0])
+        project_name = input('Enter project name:')
         # connect to class Project to get name list
 
         # make sure that project name is valid
         if db_find_project(project_name):
             if project_voted(project_name):
-                choice = input("The project you chose have been voted, "
-                               "enter D - to you can drop you previous vote\n"
+                choice = input("***Warning: The project you chose have been voted, "
+                               "enter D - you can drop you previous vote\n"
                                "enter any other key to give up vote")
                 if choice == 'D':
                     drop_table(project_name)
@@ -111,7 +127,7 @@ def enter_votes():
             members_number = len(member_list)
             print('There are {} team members.'.format(members_number))
             print('\n')
-            member_class_list = []
+            global member_class_list
             for member_name in member_list:
                 vote_list = []
                 while True:
@@ -130,15 +146,18 @@ def enter_votes():
                                     print("***Error: Votes must be integers. Please Enter "
                                           "{}'s points for {} again.".format(member_name, second_name))
                                     continue
+                                    # If a vote is not integer, will ask him/her to enter this particular vote again.
                         else:
                             vote_list.append('0')
                     if count == 100:
+                        # check whether the sum of the votes is 100 or not.
                         break
                     else:
                         print('\n')
                         print("***Error: Points must add up to 100. Please Enter {}'s votes again.".format(member_name))
                         vote_list = []
                         continue
+                        # If not equals 100, will need to enter his/her vote for all other members again.
 
                 person = Person(project_name, member_name, vote_list)
                 member_class_list.append(person)
@@ -152,14 +171,71 @@ def enter_votes():
     print('\n')
 
 
+def exit_project():
+    """
+    before exiting project, we need to call file_output to output file.
+
+    @return:
+    """
+
+    project_list_db = DB_show_project()
+    if project_list_db != ():
+        try:
+            fileIO.file_output(project_list_db)
+        except KeyError as e:
+            print("You haven't voted for existing projects. Can't get file output.")
+    db_close()
+    exit()
+
+
 def show_project():
     """
-    call DB_show to get project data from database. At this stage,
+    call DB_show to get project data from class. At this stage,
     you can find the project name and vote result of it.
+
+    DB_show() is a function directly get data from database, but it's commented now
+    because we write a way to access.
 
     @return: None
     """
-    DB_show()
+    global project_list
+    global member_class_list
+    project_name_list = []
+    if project_name_list is None:
+        print('You haven\'t voted')
+    elif project_list == []:
+        print("You haven't established any project")
+    else:
+        for project in project_list:
+            print(project)
+            project_name_list.append(project.p_name)
+
+        choice = input("Enter the project name from above:")
+        print("\n")
+        while choice not in project_name_list:
+            # if user enter a choice not in project_name_list,
+            choice = input("No such project! Enter again:")
+            # flag is assigned to 1 when a person class is successfully found.
+        flag = 0
+        voted = 0
+        for i in range(len(member_class_list)):
+            if member_class_list[i].p_name == choice:
+                voted = 1
+                break
+        if voted:
+            allocation = cv.calculate_vote(choice)
+        j = 0
+        for i in range(len(member_class_list)):
+            if member_class_list[i].p_name == choice:
+                flag = 1
+                print('\t%s:\t%.2f' % (member_class_list[i].m_name, allocation[j]*100))
+                j += 1
+        else:
+            if flag == 0:
+                print("You haven't voted")
+
+    input("\npress <Enter> to return the main menu:")
+    # DB_show()
     return 0
 
 

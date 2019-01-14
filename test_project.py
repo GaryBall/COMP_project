@@ -40,12 +40,16 @@ class TestMainMenu(unittest.TestCase):
 
         except ValueError as e:
             print("database show failed")
+        sql_del = "drop table if exists PROJECT_COPY"
+        cursor.execute(sql_del)
         sql_copy = "create table PROJECT_COPY select * from PROJECT"
         cursor.execute(sql_copy)
         for project_name in db_list:
+            sql_del = "drop table if exists %s_COPY" % (project_name)
+            cursor.execute(sql_del)
             sql_copy = "create table %s_COPY select * from %s" % (project_name, project_name)
             cursor.execute(sql_copy)
-        db.close()
+            db.close()
 
     def tearDown(self):
         """
@@ -66,8 +70,9 @@ class TestMainMenu(unittest.TestCase):
                 print(row[0])
                 db_list.append(row[0])
 
-        except ValueError as e:
+        except:
             print("database show failed")
+
         sql_del = "drop table if exists PROJECT"
         cursor.execute(sql_del)
         sql_del = "rename table PROJECT_COPY to PROJECT"
